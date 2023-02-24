@@ -1,52 +1,50 @@
-import React, { Component } from 'react';
-import './App.css';
-import Counters from "./components/counters";
-import NavBar from './components/navbar';
+import "./App.css"
+import React, { useEffect, useState} from "react"
+import Recipe from "./Recipe"
+ function App () {
 
-class App extends Component {
+const APP_ID = "3f1573a5"
+const APP_KEY = "b0d66be0c35a3a9658d9eb2730d94faa"
 
-  state = { 
-    counters: [
-        { id:1, value : 0},
-        { id:2, value : 0},
-        { id:3, value : 0},
-        { id:4, value : 0}
-    ]
- } 
- handleIncrement = counter => {
-    const counters = [...this.state.counters];
-    const index = counters.indexOf(counter)
-    counters[index] = { ...counter }
-    counters[index].value++
-    this.setState({ counters })
- }
- handleReset = () => {
-    const counters = this.state.counters.map(counter => {
-        counter.value = 0;
-        return counter
-    })
-    this.setState({counters})
- }
- handleDelete = counterId => {
-  console.log("en event was called", counterId)
-const counters = this.state.counters.filter(counter => counter.id !== counterId)
-this.setState({counters})
- }
-  render() { 
-    return ( 
-    <React.Fragment>
-        <NavBar totalCounters={this.state.counters.filter(counter => counter.value > 0).length}/>
-      <main className="container">
-        <Counters 
-        counters={this.state.counters}
-        onReset={this.handleReset} 
-        onDelete={this.handleDelete}
-         onIncrement={this.handleIncrement}/>
-      </main>
-    </React.Fragment>
-     );
-  }
+const [recipes, setRecipes] = useState([]) 
+const [search, setSearch] = useState("")
+const [query, setQuery] = useState("chicken")
+const updateSearch = e => {
+  setSearch(e.target.value)
 }
- 
+const getSearch = e => {
+  e.preventDefault()
+  setQuery(search)
+  setSearch("")
+}
+useEffect(() => {
 
-export default App;
+getRecipes();
+
+ }, [query]);
+
+ const getRecipes = async () => {
+    const response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`)
+     const data =  await response.json()
+     setRecipes(data.hits);
+     console.log(data.hits);
+  }
+
+return(
+    <div className="App">
+    <form onSubmit={getSearch} className="form-search">
+      <input className="search-bar" type="text" value={search} onChange={updateSearch}/>
+      <button className="search-button" type="submit" >Search</button>
+    </form>
+    <div className="recipes">
+       {recipes.map (recipe => (
+     <Recipe key={recipe.recipe.label} title={recipe.recipe.label} 
+      ingredients={recipe.recipe.ingredients}  calories={recipe.recipe.calories}
+      image={recipe.recipe.image}
+     />
+       ))}
+       </div>
+    </div>
+  )
+ }
+ export default App;
