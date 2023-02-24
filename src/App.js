@@ -33,7 +33,7 @@ getRecipes();
 return(
     <div className="App">
     <form onSubmit={getSearch} className="form-search">
-      <input className="search-bar" type="text" value={search} onChange={updateSearch}/>
+      <input className="search-bar" placeholder="search recipes" type="text" value={search} onChange={updateSearch}/>
       <button className="search-button" type="submit" >Search</button>
     </form>
     <div className="recipes">
